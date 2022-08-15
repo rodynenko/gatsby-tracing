@@ -1,6 +1,6 @@
 # Lets trace Gatsby
 
-_Author: Taras Rodynenko (t.rodynenko@gmail.com)_
+_Author: Taras Rodynenko_
 
 Gatsby is one of most known SSG frameworks nowadays, and you can find a lot of guides how to configure your project for your needs. Gatsby team and commutiny spend time to make Gatsby builds performant and optimal. But sometime your own configurations can shot in your feet, and you need to find where is the bottleneck and why builds are so long. In this articles we are going to setup solution that can help you to look inside your builds. We are going to talk about tracing.
 
@@ -112,9 +112,9 @@ const sampler = new AlwaysOnSampler()
 
 There is a [list of standard attributes](https://opentelemetry.io/docs/reference/specification/resource/semantic_conventions/) where some default values are defined.
 
-There is no requirements for setting Resources, except `service_name`, that helps to differenciate different information services on monitoring or visualizing service (Collector).
+There is no requirements for setting Resources, except `service_name`, that helps to differenciate information services on monitoring or visualizing service (Collector).
 
-When using SDK setup, OpenTelemetry also autimatically adds [some properties](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-resources/src/detectors/ProcessDetector.ts#L33) from `process`, and [some properties from environment variable `OTEL_RESOURCE_ATTRIBUTES`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-resources/src/detectors/EnvDetector.ts#L49)
+When using SDK setup, OpenTelemetry also automatically adds [some properties](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-resources/src/detectors/ProcessDetector.ts#L33) from `process`, and [some properties from environment variable `OTEL_RESOURCE_ATTRIBUTES`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-resources/src/detectors/EnvDetector.ts#L49)
 ```js
 const resource = new Resource({
   [SemanticResourceAttributes.SERVICE_NAME]: `gatsby`,
@@ -139,10 +139,10 @@ const exporter = new JaegerExporter({
 SpanProcessor setups how Spans will be sent to the consuming service through Exporter.
 
 There are two basic options:
-  1. Batching (grouping together in one request, default value in SDK solution)
+  1. Batching (grouping together in several big requests, default value in SDK solution)
   2. Simple (send one by one)
 
-It is recommended to group spans to reduce impact on consuming service (like Jaeger server)
+It is recommended to group spans to reduce impact on consuming service (like Jaeger server).
 ```js
 const spanProcessor = new BatchSpanProcessor(exporter)
 ```
@@ -155,7 +155,7 @@ OpenTelemetry has [Context](https://github.com/open-telemetry/opentelemetry-js-a
 
 [Propagator](https://opentelemetry.io/docs/reference/specification/overview/#propagators) is using to define the method of serialize and deserialize context values, and transportation method. You can also read much more about [Propagator API](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.0/specification/context/api-propagators.md) itself. 
 
-In our example, we will use default ContextManager (based on [AsyncLocalStorage](https://nodejs.org/api/async_context.html#async_context_class_asynclocalstorage)) and Propagator proposed in OpenTelemetry SDK that is based on [W3C trace context specification](https://www.w3.org/TR/trace-context/), in short words, it uses similar logic to HTTP headers that provides context - [W3CTraceContextPropagator](https://github.com/open-telemetry/opentelemetry-js/blob/3cca2cec8f4e45b4de2f8f4fd0b10d32627f1c63/packages/opentelemetry-core/src/trace/W3CTraceContextPropagator.ts).
+In our example, we will use default ContextManager (based on [AsyncLocalStorage](https://nodejs.org/api/async_context.html#async_context_class_asynclocalstorage)) and Propagator, that is proposed in OpenTelemetry SDK, and based on [W3C trace context specification](https://www.w3.org/TR/trace-context/), in short words, it uses similar logic to HTTP headers that provides context - [W3CTraceContextPropagator](https://github.com/open-telemetry/opentelemetry-js/blob/3cca2cec8f4e45b4de2f8f4fd0b10d32627f1c63/packages/opentelemetry-core/src/trace/W3CTraceContextPropagator.ts).
 
 ```js
 const contextManager = undefined
@@ -164,7 +164,7 @@ const propagator = new W3CTraceContextPropagator()
 
 #### Tracer provider
 
-[TraceProvider](https://opentelemetry.io/docs/reference/specification/trace/api/#tracerprovider) mixes all configurations together, and provide the Tracer instance
+[TraceProvider](https://opentelemetry.io/docs/reference/specification/trace/api/#tracerprovider) mixes all configurations together, and provides the Tracer instance.
 
 ```js
 const tracerProvider = new NodeTracerProvider({
@@ -183,7 +183,7 @@ tracerProvider.register({
 
 #### Instrumentation (optional)
 
-[Intrumentation](https://opentelemetry.io/docs/concepts/instrumenting/) configurates libraries to provide information in OpenTelementry format. In short, it wraps core functionalities to create traces and spans. For example if you want to collect information about node js or express internal calls. library [`@opentelemetry/auto-instrumentations-node`](https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node#supported-instrumentations) includes instrumentations for many different libraries and environments like Express, Koa, Restify, Fastify, AWS Lambda etc
+[Intrumentation](https://opentelemetry.io/docs/concepts/instrumenting/) configurates libraries to provide information in OpenTelementry format. In short, it wraps core functionalities to create traces and spans. For example, if you want to collect information about NodeJS or Express internal calls. library [`@opentelemetry/auto-instrumentations-node`](https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node#supported-instrumentations) includes instrumentations for many different libraries and environments like Express, Koa, Restify, Fastify, AWS Lambda etc.
 
 For our example, we do not need to collect information about outer environment, so instrumentation part is commented out in example code.
 
@@ -223,7 +223,7 @@ exports.stop = async () => {
 Now when we have provided all tracing configurations to Gatsby we can finally send our build traces 🙌
 
 We have two options to do that: 
-1. in case of use `sdk` libraries (because they are use asyncrinical setup for OpenTelementry API). See [`tracing-sdk.js`](./gatsby-starter-blog-example/tracing-sdk.js)
+1. in case of use `sdk` libraries (because they are use asynchronous setup for OpenTelementry API). See [`tracing-sdk.js`](./gatsby-starter-blog-example/tracing-sdk.js)
 ```bash
 GATSBY_OPEN_TRACING_CONFIG_FILE=tracing-sdk.js node -r ./tracing-sdk.js node_modules/gatsby/cli.js build
 ```
