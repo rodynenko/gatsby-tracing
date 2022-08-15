@@ -1,4 +1,4 @@
-# Lets trace Gatsby
+# Let's trace Gatsby
 
 _Author: Taras Rodynenko_
 
