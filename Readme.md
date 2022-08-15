@@ -6,7 +6,7 @@ Gatsby is one of most known SSG frameworks nowadays, and you can find a lot of g
 
 ## What is Tracing?
 
-[Tracing](https://en.wikipedia.org/wiki/Tracing_(software)) is the process that provides developers with information useful for debugging. It sounds very closer to logging, isn't it? Yeah, it is, and there is no clear difference between tracing and logging, everything is in details. Here when we are talking about Gatsby tracing, so we mean getting information about internal Gatsby processes and their parts that happens during the build.
+[Tracing](https://en.wikipedia.org/wiki/Tracing_(software)) is the process that provides developers with information useful for debugging. It sounds very closer to logging, isn't it? Yeah, it is, and there is no clear difference between tracing and logging, everything is in details. Here when we are talking about Gatsby tracing, we mean getting information about internal Gatsby processes and their parts that happens during the build.
 
 ![](./assets/jaeger-gatsby-build.png)
 
@@ -14,7 +14,7 @@ Some of information we already get from build logs, like
 
 ```Page build state was successful: 8.6s``` 
 
-Logs help us to understand progress and timing information. Unfortunately, there is no clear way to see and compare those values in dynamic, or look deeper (closer to child processes). When it comes to performance investigation, it is good to have opportunity to separate moer detailed data from common log flow. And we have a tool - turn on [performance tracing for Gatsby builds](https://www.gatsbyjs.com/docs/performance-tracing/)
+Logs help us to understand progress and timing information. Unfortunately, there is no clear way to see and compare those values in dynamic, or look deeper (closer to child processes). When it comes to performance investigation, it is good to have opportunity to separate more detailed data from common log flow. And we have a tool - turn on [performance tracing for Gatsby builds](https://www.gatsbyjs.com/docs/performance-tracing/)
 
 ## Collecting traces
 
@@ -23,7 +23,7 @@ We can find out from Gatsby documentation that there are several tracing formats
 * [OpenTracing](https://opentracing.io/). Deprecated, but Gatsby is using it internally
 * [OpenTelemetry](https://opentelemetry.io/). Merger of the OpenTracing and [OpenCensus](https://opencensus.io/) projects. There is a shim from OpenTracing to OpenTelemetry.
 
-We will use OpenTelemetry in our examples, but first lets provide some useful definitions for building blocks from OpenTeletry documentations:
+We will use OpenTelemetry in our example, but first lets provide some useful definitions for building blocks from OpenTeletry documentations:
 
 * [Span](https://opentelemetry.io/docs/concepts/signals/traces/#spans-in-opentelemetry) represents a unit of work or operation (like method or plugin call). Spans are the building blocks of Traces.
 * [Traces](https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces), or Distributed Traces, records the paths taken by requests as they propagate through multi-service architectures, like microservice and serverless applications. 
@@ -32,7 +32,7 @@ In our case we collect trace (called `build`, because we will call `gatsby build
 
 ## Test project
 
-In order to make some test runs, we need Gatsby project with configuration for tracing. For simplicity, lets use default `gatsby-starter-blog` as a start:
+In order to make some test runs, we need Gatsby project with configuration for tracing. For simplicity, lets use default `gatsby-starter-blog` as a start (you can find installed default project in `./gatsby-starter-blog-example`):
 
 ```bash
 npx gatsby new gatsby-starter-blog https://github.com/gatsbyjs/gatsby-starter-blog
@@ -124,7 +124,7 @@ const resource = new Resource({
 
 #### Exporter
 
-[Exporter](https://opentelemetry.io/docs/instrumentation/js/exporters/) provides opportunity to export traces to the chosen service. (like Jaeger, Dynatrace etc)
+[Exporter](https://opentelemetry.io/docs/instrumentation/js/exporters/) provides opportunity to export traces to the chosen service (collector, like Jaeger, Dynatrace etc)
 
 In our example we are going to use Jaeger's one.
 
